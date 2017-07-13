@@ -27,8 +27,7 @@ function checkAuth(req, res, next) {
 
 
 //ROUTES
-app.get('/', function (req, res) {
-    console.log("session", req.session);
+app.get('/homepage', function (req, res) {
     res.render('index');
 })
 
@@ -36,7 +35,7 @@ app.get('/signup', function (req, res) {
     res.render('signup')
 })
 
-app.get('/profile', checkAuth, function (req, res) {
+app.get('/', checkAuth, function (req, res) {
     res.render('profile', { user: req.session.user });
 })
 
@@ -49,45 +48,39 @@ app.get('/login', function (req, res) {
 })
 
 app.post("/login", function (req, res) {
-    console.log(req.body);
     if (!req.body || !req.body.username || !req.body.password) {
-        console.log("missing data");
-        return res.redirect('/')
+        return res.redirect('/homepage')
     }
 
     var requestingUser = req.body;
     var userRecord;
 
     users.forEach(function (item) {
-        console.log(item);
         if (item.username === requestingUser.username) {
             userRecord = item;
         }
     });
     if (!userRecord) {
-        console.log("no user rec");
         return res.redirect('/login');//user not found
     }
 
     if (requestingUser.password === userRecord.password) {
         req.session.user = userRecord;
-        return res.redirect('/profile')
+        return res.redirect('/')
     } else {
-        console.log("wrong password");
         return res.redirect('/login')
     }
 })
 
 app.post('/users', function (req, res) {
     if (!req.body || !req.body.username || !req.body.password) {
-        res.redirect('/');
+        res.redirect('/homepage');
     }
     var newUser = {
         username: req.body.username,
         password: req.body.password
     };
     users.push(newUser);
-    console.log("users", users);
     return res.redirect("login")
 })
 
